@@ -19,15 +19,20 @@ jobs:
           mv sdks-master/* ~/theos/sdks/
           echo "THEOS=~/theos" >> $GITHUB_ENV
 
+      - name: Install ldid
+        run: |
+          brew install ldid
+          # التأكد من أن ldid متاح للثيوس
+          sudo ln -s /usr/local/bin/ldid /usr/bin/ldid || true
+
       - name: Build Dylib
         run: |
           export THEOS=~/theos
           make FINALPACKAGE=1
-          # سحب الملف للمجلد الرئيسي باسم واضح
           find .theos/obj -name "*.dylib" -exec cp {} ./GoldSnapV10.dylib \;
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GoldSnap-Package
+          name: GoldSnap-Final
           path: GoldSnapV10.dylib
