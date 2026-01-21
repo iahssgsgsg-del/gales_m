@@ -8,7 +8,8 @@ TWEAK_NAME = GoldSnapV10
 GoldSnapV10_FILES = Tweak.x
 GoldSnapV10_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 GoldSnapV10_FRAMEWORKS = UIKit Foundation
-# هذا السطر يخلي الملف "رسمي" وإيساين يشوف مساراته
+# السطرين اللي تحت هم الحل
+GoldSnapV10_CODESIGN_FLAGS = -S/dev/null
 GoldSnapV10_LDFLAGS = -install_name @executable_path/GoldSnapV10.dylib
 
 include $(THEOS_MAKE_PATH)/tweak.mk
