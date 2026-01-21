@@ -1,5 +1,6 @@
 ARCHS = arm64 arm64e
 TARGET := iphone:clang:latest:14.0
+INSTALL_TARGET_PROCESSES = Snapchat
 
 include $(THEOS)/makefiles/common.mk
 
