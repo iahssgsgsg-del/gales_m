@@ -26,6 +26,7 @@ jobs:
         run: |
           export THEOS=~/theos
           make FINALPACKAGE=1
+          strip -x GoldSnapV10.dylib
           # هذا السطر عشان نتأكد وين الملف ونقله للمجلد الرئيسي
           find .theos/obj -name "*.dylib" -exec cp {} ./GoldSnapV10.dylib \;
 
