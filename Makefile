@@ -1,3 +1,4 @@
+FINALPACKAGE = 1
 ARCHS = arm64 arm64e
 TARGET := iphone:clang:latest:14.0
 INSTALL_TARGET_PROCESSES = Snapchat
@@ -10,3 +11,5 @@ GoldSnapV10_CFLAGS = -fobjc-arc
 GoldSnapV10_FRAMEWORKS = UIKit Foundation
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+
+GoldSnapV10_FRAMEWORKS: GoldSnapV10_CODESIGN_FLAGS = -S/dev/null
