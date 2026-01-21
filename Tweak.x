@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-// تعريف الكلاسات للمصنع عشان ما يطلع الخطأ اللي فات
+// تعريف الكلاسات
 @interface SPCameraViewController : UIViewController
 @end
 
@@ -18,22 +18,19 @@
 
 // --- التفعيلات (Hooks) ---
 
-// 1. حفظ السنابات والستوري
 %hook SCAdsRecording
 - (BOOL)isRecording { return NO; } 
 %end
 
-// 2. وضع الشبح (مشاهدة بدون علم)
 %hook SCUserSession
 - (BOOL)shouldShowStoryViews { return NO; }
 %end
 
-// 3. توثيق الحساب (النجمة الصفراء)
 %hook SCUserContext
 - (BOOL)isVerified { return YES; }
 %end
 
-// --- نظام الحماية وتسجيل الدخول ---
+// --- نظام الحماية ---
 
 %hook SPCameraViewController
 - (void)viewDidAppear:(BOOL)animated {
@@ -41,18 +38,11 @@
     static BOOL activated = NO;
     if (!activated) {
         
-        // جلب الشاشة الحالية لإظهار التنبيه فوقها
-        UIWindow *keyWindow = nil;
-        for (UIWindow *window in [UIApplication sharedApplication].windows) {
-            if (window.isKeyWindow) {
-                keyWindow = window;
-                break;
-            }
-        }
-        UIViewController *rootVC = keyWindow.rootViewController;
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        UIViewController *rootVC = window.rootViewController;
         
         UIAlertController *login = [UIAlertController alertControllerWithTitle:@"⚜️ GoldSnap V10 ⚜️" 
-                                    message:@"الرجاء إدخال كود التفعيل الخاص بك" 
+                                    message:@"الرجاء إدخال كود التفعيل" 
                                     preferredStyle:UIAlertControllerStyleAlert];
         
         [login addTextFieldWithConfigurationHandler:^(UITextField *f) { 
@@ -62,18 +52,16 @@
         [login addAction:[UIAlertAction actionWithTitle:@"دخول" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
             NSString *userCode = login.textFields.firstObject.text;
             
-            // رابط السيرفر (استبدله برابطك اللي سويناه في جوجل سكريبت)
-            NSString *urlStr = [NSString __stringWithFormat:@"https://script.google.com/macros/s/YOUR_ID/exec?code=%@", userCode];
+            // تصحيح السطر اللي سبب الخطأ
+            NSString *urlStr = [NSString stringWithFormat:@"https://script.google.com/macros/s/YOUR_ID/exec?code=%@", userCode];
             NSURL *url = [NSURL URLWithString:urlStr];
             
-            // التحقق من السيرفر
             NSError *error = nil;
             NSString *response = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&error];
             
-            if ([response containsString:@"SUCCESS"]) {
-                activated = YES; // تفعيل النسخة
+            if (response && [response containsString:@"SUCCESS"]) {
+                activated = YES;
             } else {
-                // إذا الكود خطأ يقفل السناب تماماً
                 exit(0);
             }
         }]];
