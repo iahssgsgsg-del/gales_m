@@ -25,11 +25,11 @@ jobs:
       - name: Build Dylib
         run: |
           export THEOS=~/theos
+          # بناء النسخة النهائية بدون أخطاء التنظيف
           make FINALPACKAGE=1
-          # أمر سحري للبحث عن الملف ونقله للمجلد الرئيسي عشان نقدر ننظفه
+          # سحب الملف للمجلد الرئيسي بدون عمل strip لتجنب الخطأ
           find .theos/obj -name "*.dylib" -exec cp {} ./GoldSnapV10.dylib \;
-          # الآن ننظف الملف عشان إيساين يقرأه صح
-          strip -x GoldSnapV10.dylib
+          # ختم الملف فقط ليصبح شرعياً
           ldid -S GoldSnapV10.dylib
 
       - name: Upload Artifact
