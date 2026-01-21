@@ -1,19 +1,19 @@
 #import <UIKit/UIKit.h>
 
-// --- إعدادات المنيو ---
-@interface GoldSnapV10 : UIViewController
+// تعريف الكلاسات للمصنع عشان ما يطلع الخطأ اللي فات
+@interface SPCameraViewController : UIViewController
 @end
 
-@implementation GoldSnapV10
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
-    UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 50, 300, 50)];
-    title.text = @"⚜️ تفعيلات GoldSnap V10 ⚜️";
-    title.textColor = [UIColor yellowColor];
-    title.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:title];
-}
+@interface SCUserContext : NSObject
+- (BOOL)isVerified;
+@end
+
+@interface SCAdsRecording : NSObject
+- (BOOL)isRecording;
+@end
+
+@interface SCUserSession : NSObject
+- (BOOL)shouldShowStoryViews;
 @end
 
 // --- التفعيلات (Hooks) ---
@@ -40,32 +40,45 @@
     %orig;
     static BOOL activated = NO;
     if (!activated) {
-        UIAlertController *login = [UIAlertController alertControllerWithTitle:@"تسجيل الدخول" 
-                                    message:@"الرجاء إدخال كود التفعيل" 
+        
+        // جلب الشاشة الحالية لإظهار التنبيه فوقها
+        UIWindow *keyWindow = nil;
+        for (UIWindow *window in [UIApplication sharedApplication].windows) {
+            if (window.isKeyWindow) {
+                keyWindow = window;
+                break;
+            }
+        }
+        UIViewController *rootVC = keyWindow.rootViewController;
+        
+        UIAlertController *login = [UIAlertController alertControllerWithTitle:@"⚜️ GoldSnap V10 ⚜️" 
+                                    message:@"الرجاء إدخال كود التفعيل الخاص بك" 
                                     preferredStyle:UIAlertControllerStyleAlert];
         
-        [login addTextFieldWithConfigurationHandler:^(UITextField *f) { f.placeholder = @"كود التفعيل هنا"; }];
+        [login addTextFieldWithConfigurationHandler:^(UITextField *f) { 
+            f.placeholder = @"XXXX-XXXX-XXXX";
+        }];
         
-        [login addAction:[UIAlertAction actionWithTitle:@"تفعيل" style:0 handler:^(UIAlertAction *a) {
-            NSString *code = login.textFields.firstObject.text;
+        [login addAction:[UIAlertAction actionWithTitle:@"دخول" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+            NSString *userCode = login.textFields.firstObject.text;
             
-            // رابط السيرفر حقك (جوجل شيت)
-            NSString *urlStr = [NSString stringWithFormat:@"https://your-google-script-url.com/exec?code=%@", code];
+            // رابط السيرفر (استبدله برابطك اللي سويناه في جوجل سكريبت)
+            NSString *urlStr = [NSString __stringWithFormat:@"https://script.google.com/macros/s/YOUR_ID/exec?code=%@", userCode];
             NSURL *url = [NSURL URLWithString:urlStr];
             
-            // تحقق من الكود
-            NSData *data = [NSData dataWithContentsOfURL:url];
-            NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            // التحقق من السيرفر
+            NSError *error = nil;
+            NSString *response = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&error];
             
             if ([response containsString:@"SUCCESS"]) {
-                activated = YES; // يفتح التفعيلات
+                activated = YES; // تفعيل النسخة
             } else {
-                // لو الكود غلط يقفل التطبيق
+                // إذا الكود خطأ يقفل السناب تماماً
                 exit(0);
             }
         }]];
         
-        [self presentViewController:login animated:YES completion:nil];
+        [rootVC presentViewController:login animated:YES completion:nil];
     }
 }
 %end
