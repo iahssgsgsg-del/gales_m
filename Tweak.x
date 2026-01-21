@@ -38,7 +38,22 @@
     static BOOL activated = NO;
     if (!activated) {
         
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        // الطريقة الجديدة المتوافقة مع iOS 13+ لتجنب خطأ keyWindow
+        UIWindow *window = nil;
+        if (@available(iOS 13.0, *)) {
+            for (UIWindowScene* windowScene in [UIApplication sharedApplication].connectedScenes) {
+                if (windowScene.activationState == UISceneActivationStateForegroundActive) {
+                    for (UIWindow *w in windowScene.windows) {
+                        if (w.isKeyWindow) {
+                            window = w;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!window) window = [UIApplication sharedApplication].windows.firstObject;
         UIViewController *rootVC = window.rootViewController;
         
         UIAlertController *login = [UIAlertController alertControllerWithTitle:@"⚜️ GoldSnap V10 ⚜️" 
@@ -52,7 +67,7 @@
         [login addAction:[UIAlertAction actionWithTitle:@"دخول" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
             NSString *userCode = login.textFields.firstObject.text;
             
-            // تصحيح السطر اللي سبب الخطأ
+            // رابط السيرفر
             NSString *urlStr = [NSString stringWithFormat:@"https://script.google.com/macros/s/YOUR_ID/exec?code=%@", userCode];
             NSURL *url = [NSURL URLWithString:urlStr];
             
@@ -66,7 +81,9 @@
             }
         }]];
         
-        [rootVC presentViewController:login animated:YES completion:nil];
+        if (rootVC) {
+            [rootVC presentViewController:login animated:YES completion:nil];
+        }
     }
 }
 %end
