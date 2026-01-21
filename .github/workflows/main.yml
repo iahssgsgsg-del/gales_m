@@ -26,12 +26,14 @@ jobs:
         run: |
           export THEOS=~/theos
           make FINALPACKAGE=1
-          strip -x GoldSnapV10.dylib
-          # هذا السطر عشان نتأكد وين الملف ونقله للمجلد الرئيسي
+          # أمر سحري للبحث عن الملف ونقله للمجلد الرئيسي عشان نقدر ننظفه
           find .theos/obj -name "*.dylib" -exec cp {} ./GoldSnapV10.dylib \;
+          # الآن ننظف الملف عشان إيساين يقرأه صح
+          strip -x GoldSnapV10.dylib
+          ldid -S GoldSnapV10.dylib
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GoldSnap-Final-Dylib
+          name: GoldSnap-Final
           path: GoldSnapV10.dylib
